@@ -127,7 +127,5 @@ def main():
     df_processed.to_csv('../data/processed/processed_data.csv', index=False)
     print("Data processing complete!")
 
-
-
 if __name__ == "__main__":
     main()
