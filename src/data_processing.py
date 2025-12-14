@@ -8,6 +8,111 @@ from datetime import datetime
 # Install xverse
 # pip install xverse
 from xverse.transformer import WOE
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+class RFMAnalysis:
+    def __init__(self):
+        self.scaler = StandardScaler()
+        self.kmeans = None
+        
+    def calculate_rfm(self, df, snapshot_date=None):
+        """Calculate RFM metrics for each customer"""
+        if snapshot_date is None:
+            snapshot_date = df['TransactionStartTime'].max()
+        
+        df['TransactionStartTime'] = pd.to_datetime(df['TransactionStartTime'])
+        
+        # Calculate RFM
+        rfm = df.groupby('CustomerId').agg({
+            'TransactionStartTime': lambda x: (snapshot_date - x.max()).days,  # Recency
+            'TransactionId': 'count',  # Frequency
+            'Amount': 'sum'  # Monetary
+        }).reset_index()
+        
+        rfm.columns = ['CustomerId', 'Recency', 'Frequency', 'Monetary']
+        
+        return rfm
+    
+    def cluster_customers(self, rfm_df, n_clusters=3, random_state=42):
+        """Perform K-Means clustering on RFM data"""
+        # Select RFM columns
+        rfm_features = rfm_df[['Recency', 'Frequency', 'Monetary']].copy()
+        
+        # Handle any missing values
+        rfm_features = rfm_features.fillna(0)
+        
+        # Scale features
+        rfm_scaled = self.scaler.fit_transform(rfm_features)
+        
+        # Perform clustering
+        self.kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
+        rfm_df['Cluster'] = self.kmeans.fit_predict(rfm_scaled)
+        
+        return rfm_df
+    
+    def identify_high_risk_cluster(self, rfm_df):
+        """Identify the high-risk cluster (lowest engagement)"""
+        # Analyze cluster characteristics
+        cluster_summary = rfm_df.groupby('Cluster').agg({
+            'Recency': 'mean',
+            'Frequency': 'mean',
+            'Monetary': 'mean'
+        })
+        
+        print("Cluster Summary:")
+        print(cluster_summary)
+        
+        # High risk: High Recency (inactive), Low Frequency, Low Monetary
+        # Calculate risk score for each cluster
+        cluster_summary['risk_score'] = (
+            cluster_summary['Recency'] / cluster_summary['Recency'].max() +
+            (1 - cluster_summary['Frequency'] / cluster_summary['Frequency'].max()) +
+            (1 - cluster_summary['Monetary'] / cluster_summary['Monetary'].max())
+        )
+        
+        high_risk_cluster = cluster_summary['risk_score'].idxmax()
+        print(f"\nHigh Risk Cluster: {high_risk_cluster}")
+        
+        return high_risk_cluster
+    
+    def create_target_variable(self, df, rfm_df, high_risk_cluster):
+        """Create binary target variable"""
+        rfm_df['is_high_risk'] = (rfm_df['Cluster'] == high_risk_cluster).astype(int)
+        
+        # Merge with main dataframe
+        df = df.merge(rfm_df[['CustomerId', 'is_high_risk']], on='CustomerId', how='left')
+        
+        print(f"\nTarget Variable Distribution:")
+        print(df['is_high_risk'].value_counts())
+        
+        return df
+
+def create_target_variable_pipeline():
+    """Complete pipeline for creating target variable"""
+    # Load processed data
+    df = pd.read_csv('../data/processed/processed_data.csv')
+    
+    # Initialize RFM analysis
+    rfm_analyzer = RFMAnalysis()
+    
+    # Calculate RFM
+    rfm_df = rfm_analyzer.calculate_rfm(df)
+    
+    # Cluster customers
+    rfm_df = rfm_analyzer.cluster_customers(rfm_df, n_clusters=3)
+    
+    # Identify high-risk cluster
+    high_risk_cluster = rfm_analyzer.identify_high_risk_cluster(rfm_df)
+    
+    # Create target variable
+    df_with_target = rfm_analyzer.create_target_variable(df, rfm_df, high_risk_cluster)
+    
+    # Save final dataset
+    df_with_target.to_csv('../data/processed/data_with_target.csv', index=False)
+    print("\nTarget variable created and saved!")
+    
+    return df_with_target
 
 class FeatureEngineering:
     def __init__(self):
@@ -128,4 +233,8 @@ def main():
     print("Data processing complete!")
 
 if __name__ == "__main__":
+    # Run feature engineering
     main()
+    
+    # Create target variable
+    create_target_variable_pipeline()
