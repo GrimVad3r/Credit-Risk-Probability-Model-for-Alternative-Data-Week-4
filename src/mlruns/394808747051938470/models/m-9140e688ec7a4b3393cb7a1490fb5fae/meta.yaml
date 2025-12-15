@@ -1,0 +1,10 @@
+artifact_location: file:C:/Users/henokt/OneDrive - Inchcape/Documents/GitHub/Credit-Risk-Probability-Model-for-Alternative-Data-Week-4/src/mlruns/394808747051938470/models/m-9140e688ec7a4b3393cb7a1490fb5fae/artifacts
+creation_timestamp: 1765798475786
+experiment_id: '394808747051938470'
+last_updated_timestamp: 1765798488490
+model_id: m-9140e688ec7a4b3393cb7a1490fb5fae
+model_type: null
+name: model
+source_run_id: d455895f8da44900a8ba7508340d697e
+status: 2
+status_message: null

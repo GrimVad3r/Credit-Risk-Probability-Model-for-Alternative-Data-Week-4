@@ -18,10 +18,13 @@ class RFMAnalysis:
         
     def calculate_rfm(self, df, snapshot_date=None):
         """Calculate RFM metrics for each customer"""
+        
+        # FIX 1: Ensure TransactionStartTime is datetime *before* calculating max date.
+        # This prevents potential errors if the column is a string object type.
+        df['TransactionStartTime'] = pd.to_datetime(df['TransactionStartTime'])
+        
         if snapshot_date is None:
             snapshot_date = df['TransactionStartTime'].max()
-        
-        df['TransactionStartTime'] = pd.to_datetime(df['TransactionStartTime'])
         
         # Calculate RFM
         rfm = df.groupby('CustomerId').agg({
@@ -129,7 +132,7 @@ class FeatureEngineering:
         
         # Flatten column names
         agg_features.columns = ['_'.join(col).strip('_') 
-                                for col in agg_features.columns.values]
+                                 for col in agg_features.columns.values]
         
         # Rename for clarity
         agg_features.rename(columns={
@@ -209,7 +212,9 @@ class FeatureEngineering:
         
         return df
 
-    def apply_woe_transformation(df, target_col, feature_cols):
+    # FIX 2: Added 'self' as the first argument.
+    # Without 'self', this function would fail when called as a method of the class.
+    def apply_woe_transformation(self, df, target_col, feature_cols):
         """Apply Weight of Evidence transformation"""
         woe = WOE()
         
@@ -220,8 +225,12 @@ class FeatureEngineering:
 
 def main():
     # Load raw data
-    df = pd.read_csv('../data/raw/data.csv')
-    
+    try:
+        df = pd.read_csv('../data/raw/data.csv')
+    except FileNotFoundError:
+        print("Error: Could not find '../data/raw/data.csv'. Ensure the file exists and the path is correct.")
+        return
+        
     # Initialize feature engineering
     fe = FeatureEngineering()
     
@@ -229,6 +238,8 @@ def main():
     df_processed = fe.process_data(df)
     
     # Save processed data
+    import os
+    os.makedirs('../data/processed', exist_ok=True)
     df_processed.to_csv('../data/processed/processed_data.csv', index=False)
     print("Data processing complete!")
 

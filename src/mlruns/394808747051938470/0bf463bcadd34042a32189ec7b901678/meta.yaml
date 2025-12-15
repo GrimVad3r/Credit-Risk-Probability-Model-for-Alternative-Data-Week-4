@@ -1,0 +1,14 @@
+artifact_uri: file:C:/Users/henokt/OneDrive - Inchcape/Documents/GitHub/Credit-Risk-Probability-Model-for-Alternative-Data-Week-4/src/mlruns/394808747051938470/0bf463bcadd34042a32189ec7b901678/artifacts
+end_time: 1765803359646
+entry_point_name: ''
+experiment_id: '394808747051938470'
+lifecycle_stage: active
+run_id: 0bf463bcadd34042a32189ec7b901678
+run_name: Logistic_Regression
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1765802609411
+status: 3
+tags: []
+user_id: HenokT

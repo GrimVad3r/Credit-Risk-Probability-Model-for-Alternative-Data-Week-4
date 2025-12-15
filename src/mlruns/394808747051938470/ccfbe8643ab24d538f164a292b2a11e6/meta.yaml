@@ -1,0 +1,14 @@
+artifact_uri: file:C:/Users/henokt/OneDrive - Inchcape/Documents/GitHub/Credit-Risk-Probability-Model-for-Alternative-Data-Week-4/src/mlruns/394808747051938470/ccfbe8643ab24d538f164a292b2a11e6/artifacts
+end_time: 1765791111740
+entry_point_name: ''
+experiment_id: '394808747051938470'
+lifecycle_stage: active
+run_id: ccfbe8643ab24d538f164a292b2a11e6
+run_name: Random_Forest
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1765791050755
+status: 3
+tags: []
+user_id: HenokT

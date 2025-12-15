@@ -1,0 +1,22 @@
+artifact_path: file:C:/Users/henokt/OneDrive - Inchcape/Documents/GitHub/Credit-Risk-Probability-Model-for-Alternative-Data-Week-4/src/mlruns/394808747051938470/models/m-7920ee7878344b6e9864419123e8b495/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.9
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+mlflow_version: 3.7.0
+model_id: m-7920ee7878344b6e9864419123e8b495
+model_size_bytes: 128629
+model_uuid: m-7920ee7878344b6e9864419123e8b495
+prompts: null
+run_id: 0bf463bcadd34042a32189ec7b901678
+utc_time_created: '2025-12-15 12:55:51.529154'
